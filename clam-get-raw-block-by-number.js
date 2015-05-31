@@ -24,20 +24,84 @@
         bitcore = require('bitcore'),
         async = require('async'),
         fs = require('fs'),
+        Script = bitcore.Script,
+        Block = bitcore.Block,
         ClamGetRawBlockByNumber;
     
-    ClamGetRawBlockByNumber = function(blockid) {
+    ClamGetRawBlockByNumber = function(blockid, cb) {
         var client = new clamcoin.Client(JSON.parse(fs.readFileSync('client.config', 'utf8')));
 
         client.cmd('getblockbynumber', blockid, function(err, block) {
-            console.log(block);
+            async.map(block.tx, function(tx, cb) {
+                client.cmd('gettransaction', tx, cb);
+            }, function(err, tx) {
+                if(err) {
+                    console.error(err);
+                } else {
+                    block.tx = tx;
 
-            //async map block.tx -> gettransaction
+                    cb(ClamGetRawBlockByNumber.transformBlockObject(block).toString());
+                }
+            });
         });
     };
 
     ClamGetRawBlockByNumber.transformBlockObject = function(block) {
-        console.log(block);
+        var blockTransformed = {};
+
+        blockTransformed.header = {};
+        blockTransformed.header.version = block.version;
+        blockTransformed.header.prevHash = block.previousblockhash;
+        blockTransformed.header.merkleRoot = block.merkleroot;
+        blockTransformed.header.time = block.time;
+        blockTransformed.header.bits = parseInt(block.bits, 16);
+        blockTransformed.header.nonce = block.nonce;
+
+        blockTransformed.transactions = block.tx.map(function(tx) {
+            var inputs, outputs;
+
+            inputs = tx.vin.map(function(vin) {
+                var input = {};
+
+                if(typeof vin.coinbase === 'string') {
+                    input.prevTxId = '0000000000000000000000000000000000000000000000000000000000000000';
+                    input.outputIndex = vin.sequence;
+                    input.sequenceNumber = 0;
+                    input.script = (new Script(vin.coinbase)).toString();
+                } else {
+                    input.prevTxId = vin.txid;
+                    input.outputIndex = vin.vout;
+                    input.sequenceNumber = vin.sequence;
+                    input.script = (new Script(vin.scriptSig.hex)).toString();
+                }
+
+                return input;
+            });
+
+            outputs = tx.vout.map(function(vout) {
+                var output = {};
+
+                output.satoshis = vout.value * 100000000;
+                output.script = vout.scriptPubKey.asm.split(' ').map(function(part) {
+                    if(part.split('OP_').length === 1) {
+                        return '20 0x' + part;
+                    } else {
+                        return part;
+                    }
+                }).join(' ');
+
+                return output;
+            });
+
+            return {
+                version: tx.version,
+                inputs: inputs,
+                outputs: outputs,
+                nLockTime: 0
+            };
+        });
+
+        return new Block(blockTransformed);
     };
 
     return ClamGetRawBlockByNumber;

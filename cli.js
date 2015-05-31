@@ -7,4 +7,6 @@
 
 var ClamGetRawBlockByNumber = require('./clam-get-raw-block-by-number.min.js');
 
-new ClamGetRawBlockByNumber(10000);
+ClamGetRawBlockByNumber(parseInt(process.argv[2], 10), function(block) {
+	console.log(block);
+});
