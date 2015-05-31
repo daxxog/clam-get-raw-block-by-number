@@ -1,0 +1,39 @@
+{
+    "name"        : "clam-get-raw-block-by-number",
+    "description" : "Get a raw CLAM block by number.",
+    "homepage"    : "https://github.com/daxxog/clam-get-raw-block-by-number",
+    "main"        : "clam-get-raw-block-by-number.min.js",
+    "version"     : "0.0.1",
+    "engines": {
+        "node" : ">=0.10.33"
+    },
+    "maintainers": [{
+        "name"  : "David Volm",
+        "email" : "david@volminator.com",
+        "web"   : "http://daxxog.com/"
+    }],
+    "repository": {
+        "type" : "git",
+        "url"  : "https://github.com/daxxog/clam-get-raw-block-by-number.git"
+    },
+    "devDependencies": {
+        "bitfactory": "*",
+        "stoptime": "*",
+        "uglify-js": "*",
+        "vows": "*"
+    },
+    "scripts": {
+        "build": "node make.js",
+        "test": "vows test/*",
+        "start": "node cli.js",
+        "prepublish": "npm run build"
+    },
+    "files": [
+        "cli.min.js",
+        "clam-get-raw-block-by-number.min.js",
+        "bin/clam-get-raw-block-by-number"
+    ],
+    "bin": {
+        "clam-get-raw-block-by-number" : "bin/clam-get-raw-block-by-number"
+    }
+}
