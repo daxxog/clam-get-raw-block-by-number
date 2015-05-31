@@ -3,7 +3,7 @@
   "description": "Get a raw CLAM block by number.",
   "homepage": "https://github.com/daxxog/clam-get-raw-block-by-number",
   "main": "clam-get-raw-block-by-number.min.js",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "engines": {
     "node": ">=0.10.33"
   },
@@ -41,6 +41,7 @@
   "dependencies": {
     "async": "^1.0.0",
     "bitcore": "^0.12.7",
-    "clamcoin": "^1.0.0"
+    "clamcoin": "^1.0.0",
+    "homedir": "^0.6.0"
   }
 }

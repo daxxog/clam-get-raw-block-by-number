@@ -24,26 +24,35 @@
         bitcore = require('bitcore'),
         async = require('async'),
         fs = require('fs'),
+        path = require('path'),
+        homedir = require('homedir')(),
         Script = bitcore.Script,
         Block = bitcore.Block,
         ClamGetRawBlockByNumber;
     
     ClamGetRawBlockByNumber = function(blockid, cb) {
-        var client = new clamcoin.Client(JSON.parse(fs.readFileSync('client.config', 'utf8')));
+        var configFile = path.join(homedir, '.clamrpc', 'config.json'),
+            client;
 
-        client.cmd('getblockbynumber', blockid, function(err, block) {
-            async.map(block.tx, function(tx, cb) {
-                client.cmd('gettransaction', tx, cb);
-            }, function(err, tx) {
-                if(err) {
-                    console.error(err);
-                } else {
-                    block.tx = tx;
+        if(!fs.existsSync(configFile)) {
+            console.error(configFile + ' does not exist!');
+        } else {
+            client = new clamcoin.Client(JSON.parse(fs.readFileSync(configFile, 'utf8')));
 
-                    cb(ClamGetRawBlockByNumber.transformBlockObject(block).toString());
-                }
+            client.cmd('getblockbynumber', blockid, function(err, block) {
+                async.map(block.tx, function(tx, cb) {
+                    client.cmd('gettransaction', tx, cb);
+                }, function(err, tx) {
+                    if(err) {
+                        console.error(err);
+                    } else {
+                        block.tx = tx;
+
+                        cb(ClamGetRawBlockByNumber.transformBlockObject(block).toString());
+                    }
+                });
             });
-        });
+        }
     };
 
     ClamGetRawBlockByNumber.transformBlockObject = function(block) {
