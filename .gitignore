@@ -7,3 +7,4 @@ cli.min.js
 clam-get-raw-block-by-number.min.js
 block.*
 client.config
+rpchelp.txt
