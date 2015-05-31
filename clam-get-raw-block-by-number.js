@@ -20,7 +20,25 @@
         root.ClamGetRawBlockByNumber = factory();
   }
 }(this, function() {
-    var ClamGetRawBlockByNumber;
+    var clamcoin = require('clamcoin'),
+        bitcore = require('bitcore'),
+        async = require('async'),
+        fs = require('fs'),
+        ClamGetRawBlockByNumber;
     
+    ClamGetRawBlockByNumber = function(blockid) {
+        var client = new clamcoin.Client(JSON.parse(fs.readFileSync('client.config', 'utf8')));
+
+        client.cmd('getblockbynumber', blockid, function(err, block) {
+            console.log(block);
+
+            //async map block.tx -> gettransaction
+        });
+    };
+
+    ClamGetRawBlockByNumber.transformBlockObject = function(block) {
+        console.log(block);
+    };
+
     return ClamGetRawBlockByNumber;
 }));

@@ -5,3 +5,5 @@ npm-debug.log
 ._.DS_Store
 cli.min.js
 clam-get-raw-block-by-number.min.js
+block.*
+client.config
