@@ -23,6 +23,7 @@
     var clamcoin = require('clamcoin'),
         bitcore = require('bitcore'),
         async = require('async'),
+        BigNumber = require('bignumber.js'),
         fs = require('fs'),
         path = require('path'),
         homedir = require('homedir')(),
@@ -90,7 +91,7 @@
             outputs = tx.vout.map(function(vout) {
                 var output = {};
 
-                output.satoshis = vout.value * 100000000;
+                output.satoshis = new BigNumber(vout.value).mul(100000000).toNumber();
                 output.script = vout.scriptPubKey.asm.split(' ').map(function(part) {
                     if(part.split('OP_').length === 1) {
                         return '20 0x' + part;
